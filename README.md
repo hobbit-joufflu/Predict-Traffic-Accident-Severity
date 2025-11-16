@@ -1,5 +1,5 @@
-# projet_python_ENSAE
-Projet du cours de Python de M1 de l'ENSAE
+# 🚗 Predict the severity of traffic accidents 
+*Projet du cours de Python de M1 de l'ENSAE*
 
 Le but de ce repo est de prédire la gravité d'un accident corporel à partir d'une multitude de caractéristiques sur le lieu, la météo, et les circonstances de l'accident. En particulier, est-ce que des données météorologiques objectives et enrichies permettent une meilleure prédiction de la gravité d'un accident que les données subjectives déjà présentes dans la base ?
 
