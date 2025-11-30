@@ -1,0 +1,6 @@
+# Data analysis
+pandas
+numpy
+
+# Learning
+scikit-learn 
