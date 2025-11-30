@@ -1,6 +1,7 @@
 # Data analysis
 pandas
 numpy
+polars
 
 # Learning
 scikit-learn 
