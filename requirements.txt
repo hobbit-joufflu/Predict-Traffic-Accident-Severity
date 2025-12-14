@@ -3,5 +3,14 @@ pandas
 numpy
 polars
 
+# Data engineering
+pyarrow
+
 # Learning
 scikit-learn 
+
+# Dataviz
+matplotlib
+seaborn
+geopandas
+folium
