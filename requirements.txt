@@ -1,13 +1,12 @@
 # Data analysis
 pandas
 numpy
-polars
 
 # Data engineering
 pyarrow
 
 # Learning
-scikit-learn 
+scikit-learn
 
 # Dataviz
 matplotlib
