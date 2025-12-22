@@ -1,15 +1,16 @@
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def plot_grav_score(df_communes, df_accidents_grv, params={}):
-    alpha_pop = params.get("alpha_pop",0.5)
-    alpha_acc = params.get("alpha_acc",0.6)
+    alpha_pop = params.get("alpha_pop",0.9)
+    alpha_acc = params.get("alpha_acc",0.5)
 
     plt.figure(figsize=(12, 12))
 
     plt.scatter(
         df_communes['lon_commune'],
         df_communes['lat_commune'],
-        s=df_communes['Population']*1.5,
+        s=df_communes['Population']**1.1,
         c='blue',
         alpha=alpha_pop,       # Transparence modérée
         linewidth=0,     # Pas de bordure pour garder l'aspect "point"
@@ -21,7 +22,7 @@ def plot_grav_score(df_communes, df_accidents_grv, params={}):
     sc = plt.scatter(
         df_accidents_grv['long'],
         df_accidents_grv['lat'],
-        s=0.5+df_accidents_grv['grav_score']**1.7,           # Taille fixe très fine, qui grossit avec la gravité de l'accident
+        s=0.2+3*df_accidents_grv['grav_score'],           # Taille fixe très fine, qui grossit avec la gravité de l'accident
         c=df_accidents_grv["grav_score"],
         cmap="Reds", 
         alpha=alpha_acc,       # Transparence pour voir la densité
@@ -32,7 +33,6 @@ def plot_grav_score(df_communes, df_accidents_grv, params={}):
     plt.title("Carte d'intensité des accidents vs Population (bleu)")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    plt.axis('equal')
 
     cbar = plt.colorbar(sc) # Barre de couleur pour lire les scores
     cbar.set_label("score de gravité cumulé")
@@ -77,7 +77,6 @@ def plot_pop_nbacc(df_communes,df_accidents,params={}):
     plt.title("Carte brute : Population (Bleu) vs Accidents (Rouge)")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    plt.axis('equal')
 
     # Légende forcée (pour voir les points même s'ils sont petits sur la carte)
     lgnd = plt.legend()

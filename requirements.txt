@@ -13,3 +13,9 @@ matplotlib
 seaborn
 geopandas
 folium
+
+# Stats
+statsmodels
+
+# Other
+joblib
