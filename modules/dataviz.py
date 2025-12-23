@@ -84,3 +84,21 @@ def plot_pop_nbacc(df_communes,df_accidents,params={}):
         handle.set_alpha(1) 
 
     plt.show()
+
+def plot_dic_grav(df_cleaned2224,dic={}):
+    plt.figure(figsize=(10,15))
+
+    for i,(col,desc) in enumerate(dic.items(),1):
+        custom_order = None
+        if col=="hr":
+            custom_order = list(range(7,24))+list(range(0,7))
+        plt.subplot(len(dic),1,i) # Création d'une grille de len(dic) lignes et une colonne
+
+        sns.barplot(x=df_cleaned2224[col],y=df_cleaned2224["grav_weight"],order=custom_order)
+
+        plt.title(f"Gravite moyenne de l'accident selon : {desc}")
+        plt.xlabel(desc,fontsize=12)
+        plt.ylabel(f"Gravite ponderee",fontsize=12)
+
+    plt.tight_layout()
+    plt.show()
