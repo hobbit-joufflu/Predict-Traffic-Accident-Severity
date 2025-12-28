@@ -2,15 +2,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def plot_grav_score(df_communes, df_accidents_grv, params={}):
-    alpha_pop = params.get("alpha_pop",0.9)
-    alpha_acc = params.get("alpha_acc",0.5)
+    alpha_pop = params.get("alpha_pop",1)
+    alpha_acc = params.get("alpha_acc",0.4)
 
     plt.figure(figsize=(12, 12))
 
     plt.scatter(
         df_communes['lon_commune'],
         df_communes['lat_commune'],
-        s=df_communes['Population']**1.1,
+        s=df_communes['Population']**1.2,
         c='blue',
         alpha=alpha_pop,       # Transparence modérée
         linewidth=0,     # Pas de bordure pour garder l'aspect "point"
@@ -86,7 +86,7 @@ def plot_pop_nbacc(df_communes,df_accidents,params={}):
     plt.show()
 
 def plot_dic_grav(df_cleaned2224,dic={}):
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=(8,12))
 
     for i,(col,desc) in enumerate(dic.items(),1):
         custom_order = None
@@ -97,8 +97,8 @@ def plot_dic_grav(df_cleaned2224,dic={}):
         sns.barplot(x=df_cleaned2224[col],y=df_cleaned2224["grav_weight"],order=custom_order)
 
         plt.title(f"Gravite moyenne de l'accident selon : {desc}")
-        plt.xlabel(desc,fontsize=12)
-        plt.ylabel(f"Gravite ponderee",fontsize=12)
+        plt.xlabel(desc,fontsize=10)
+        plt.ylabel(f"Gravite ponderee",fontsize=10)
 
     plt.tight_layout()
     plt.show()

@@ -142,3 +142,30 @@ def clean_lieux(df):
             df[c] = df[c].replace(-1, m).fillna(m)
 
     return df
+
+def clean_vehicules(df_veh):
+    df_obj = df_veh.select_dtypes(['object'])
+    df_veh[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
+    df_veh.replace([-1,"-1"], np.nan, inplace=True)
+    cols_to_clean = {
+        'senc': [-1, 0],   # -1: Non renseigné
+        'catv': [0],       # 0: Indéterminable
+        'obs': [-1, 0],    # -1: Non renseigné, 0:Sans objet
+        'obsm': [-1, 0],   # -1: Non renseigné, 0:Aucun
+        'choc': [-1, 0],   # -1: Non renseigné, 0:Aucun
+        'manv': [-1, 0],   # -1: Non renseigné, 0:Inconnu
+        'motor': [-1, 0]   # -1: Non renseigné, 0:Inconnu
+    }
+    
+    for col, values in cols_to_clean.items():
+        if col in df_veh.columns:
+            # On remplace par NaN pour l'imputation
+            df_veh[col] = df_veh[col].replace(values, np.nan)
+            # Imputation par la valeur la plus fréquente
+            df_veh[col] = df_veh[col].fillna(df_veh[col].mode()[0])
+            df_veh[col] = df_veh[col].astype(int)
+
+    # On supprime occutc
+    if 'occutc' in df_veh.columns:
+        df_veh = df_veh.drop(columns='occutc')
+    return df_veh

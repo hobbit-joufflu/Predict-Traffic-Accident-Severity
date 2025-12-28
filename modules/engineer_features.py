@@ -47,6 +47,7 @@ def trace_route(df_cleaned2224):
 def lum_atm_surf_hr(df_cleaned2224):
 
     if "hrmn" in df_cleaned2224.columns:
+        df_cleaned2224["hrmn"] = df_cleaned2224["hrmn"].astype(str).str.zfill(4)
         df_cleaned2224["hr"]=df_cleaned2224["hrmn"].astype(str).str[:2].astype(int)
     df_cleaned2224 = df_cleaned2224.drop(columns="hrmn",errors="ignore")
 
@@ -85,3 +86,36 @@ def pietons_trajet(df_cleaned2224):
     ).astype(int)
 
     return df_cleaned2224
+
+def vehic_features(df):
+
+    mass_map = {
+        1: 1.0, 2: 2.0, 3: 5.0, 7: 10.0, 10: 12.0, 13: 15.0, 14: 20.0, 
+        15: 25.0, 16: 18.0, 17: 30.0, 18: 12.0, 19: 15.0, 20: 15.0, 
+        21: 15.0, 30: 2.0, 31: 3.5, 32: 3.5, 33: 5.0, 34: 5.0, 35: 4.0, 
+        36: 6.0, 37: 25.0, 38: 25.0, 39: 100.0, 40: 80.0, 41: 5.0, 
+        42: 6.0, 43: 5.0, 50: 1.0, 60: 0.5, 80: 1.0, 99: 10.0
+    } # Coefficients de poids, liste exhaustive
+
+    df['mass_proxy'] = df['catv'].map(mass_map).fillna(10) # Par défaut, on remplace les valeurs manquantes par 10, la valeur pour un 
+    # véhicule léger, type voiture 
+    if 'vma' in df.columns:
+        df['kinetic_energy_score'] = np.log1p(df['mass_proxy']*(df["vma"]**2))
+
+    is_vulnerable = df['catv'].isin([1,2,30,31,32,33,34,41,42,43,50,60,80])
+
+    is_heavy = df['catv'].isin([13,14,15,16,17,37,38])
+
+    df['vulnerable_outside_agg'] = (is_vulnerable&(df['agg']==1)).astype(int)
+
+    df['extreme_fixed_obs_impact'] = df['obs'].isin([2,17]).astype(int)
+
+    df['curve_drift_risk'] = (df['manv'].isin([13,14]) & df['plan'].isin([2,3,4])).astype(int)
+
+    df['side_impact_junction'] = (df['choc'].isin([7,8]) & (df['int']>1)).astype(int)
+
+    df['night_fixed_obs'] = ((df['obs']>0) & (df['lum'].isin([3,4]))).astype(int)
+
+    df['heavy_vs_vulnerable_collision'] = (is_heavy & (df['obsm']==1)).astype(int)
+
+    return df
