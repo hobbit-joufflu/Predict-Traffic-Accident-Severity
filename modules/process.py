@@ -43,6 +43,10 @@ def clean_usagers(usagers_new):
     # La place dans le véhicule ne concerne que 13 enregistrements. Nous pouvons supprimer ces valeurs manquantes.
     usagers_new = usagers_new.dropna(subset="place")
 
+    # On supprime les usagers en fuite, qui représente 0.1% des données
+    if "grav" in usagers_new.columns:
+        usagers_new = usagers_new[usagers_new["grav"]!=-1]
+
     # On transforme actp en numérique
 
     # Le -1 dans "trajet" correspond à la valeur 0, "non renseigné". De même pour la localisation des piétons. Pour etatp (le piéton était-il seul ou accompagné ?), nous remplaçons les valeurs manquantes par 0. Le -1 dans les variables secu peut être assimilé au 8, "non déterminable".
