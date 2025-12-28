@@ -86,7 +86,7 @@ def plot_pop_nbacc(df_communes,df_accidents,params={}):
     plt.show()
 
 def plot_dic_grav(df_cleaned2224,dic={}):
-    plt.figure(figsize=(10,15))
+    plt.figure(figsize=(10,10))
 
     for i,(col,desc) in enumerate(dic.items(),1):
         custom_order = None

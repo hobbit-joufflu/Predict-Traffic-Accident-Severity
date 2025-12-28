@@ -34,7 +34,7 @@ def get_pipeline(categorical_features,n_jobs=None):
 
     return pipeline
 
-def run_cross_val(pipeline,X,y,n_jobs=None):
+def run_cross_val(pipeline,X_train,y_train,n_jobs=None):
     """ Exécute la cross-validation et affiche les scores """
     n_jobs_actual = n_jobs if n_jobs is not None else -1
 
@@ -42,7 +42,7 @@ def run_cross_val(pipeline,X,y,n_jobs=None):
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     print("Début de la cross-validation (cela peut prendre 15 à 20 minutes)")
 
-    cv_scores = cross_val_score(pipeline, X, y, cv=cv, scoring='f1_weighted', n_jobs=n_jobs_actual) 
+    cv_scores = cross_val_score(pipeline, X_train, y_train, cv=cv, scoring='f1_weighted', n_jobs=n_jobs_actual) 
     print(f"\nF1-score moyen : {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
 
     return cv_scores

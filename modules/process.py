@@ -39,22 +39,41 @@ def clean_usagers(usagers_new):
     df_obj = usagers_new.select_dtypes(['object'])
     usagers_new[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
     usagers_new.replace([-1,"-1"], np.nan, inplace=True)
+    
+    # Les conducteurs sont à la place 1
+    usagers_new.loc[(usagers_new['place'].isna()) & (usagers_new['catu'] == 1), 'place'] = 1
+    
+    # Les piétons sont à la place 10
+    usagers_new.loc[(usagers_new['catu'] == 3), 'place'] = 10
+    
+    # Pour les passagers restants, on utilise le mode des passagers
+    if usagers_new['place'].isna().any():
+        mode_passager = usagers_new[usagers_new['catu'] == 2]['place'].mode()[0]
+        usagers_new['place'] = usagers_new['place'].fillna(mode_passager)
 
-    # La place dans le véhicule ne concerne que 13 enregistrements. Nous pouvons supprimer ces valeurs manquantes.
-    usagers_new = usagers_new.dropna(subset="place")
 
-    # On supprime les usagers en fuite, qui représente 0.1% des données
+    # On supprime les usagers en fuite, qui représente 0.1% des données, et on formatte "grav"
     if "grav" in usagers_new.columns:
         usagers_new = usagers_new[usagers_new["grav"]!=-1]
-
-    # On transforme actp en numérique
+        mapping = {1:0, # Indemne
+           2:3, # Tué
+           3:2, # Blessé hospitalisé
+           4:1, # Blessé léger
+            }
+        usagers_new["grav_ord"] = usagers_new["grav"].map(mapping)
+        usagers_new = usagers_new.drop(columns=["grav"],errors='ignore')
 
     # Le -1 dans "trajet" correspond à la valeur 0, "non renseigné". De même pour la localisation des piétons. Pour etatp (le piéton était-il seul ou accompagné ?), nous remplaçons les valeurs manquantes par 0. Le -1 dans les variables secu peut être assimilé au 8, "non déterminable".
     cols_pietons = ["trajet","locp","etatp","actp"]
+
+    usagers_new["actp"] = usagers_new["actp"].replace({"A":7,"B":8})
+
     for col in cols_pietons:
         usagers_new[col] = pd.to_numeric(usagers_new[col],errors="coerce").fillna(0).astype(int)
+
     for i in range(1,4):
-        usagers_new[f"secu{i}"] = pd.to_numeric(usagers_new[f"secu{i}"],errors="coerce").fillna(8).astype(int)
+        if f"secu_{i}" in usagers_new.columns:
+            usagers_new[f"secu{i}"] = pd.to_numeric(usagers_new[f"secu{i}"],errors="coerce").fillna(8).astype(int)
 
     # Nous calculons l'âge, supprimons l'année de naissance, et remplaçons les données manquantes par la médiane.
     # En effet, il y a un biais de l'âge vers les plus jeunes. On évite de prendre la moyenne.
@@ -82,6 +101,9 @@ def clean_lieux(df):
     df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
     df.replace([-1,"-1"], np.nan, inplace=True)
 
+    # Suppression de colonnes sans intérêt pour la prédiction
+    df=df.drop(columns=["voie","v1","v2","pr","pr1"],errors="ignore")
+
     # Suppression variable inexploitable (>90% NaN)
     df = df.drop(columns=['lartpc'], errors='ignore')
 
@@ -104,9 +126,10 @@ def clean_lieux(df):
     # Imputation croisée : surf via atm (météo) du dataset carac
     mask = df['surf'].isna() | (df['surf'].isin([-1, 0]))
     
-    df.loc[mask & (df['atm'] == 1), 'surf'] = 1               # Temps sec -> Route sèche
-    df.loc[mask & (df['atm'].isin([2, 3, 7, 8])), 'surf'] = 2 # Pluie/brouillard -> Mouillée
-    df.loc[mask & (df['atm'] == 4), 'surf'] = 5               # Neige -> Enneigée
+    if 'atm' in df.columns:
+        df.loc[mask & (df['atm'] == 1), 'surf'] = 1               # Temps sec -> Route sèche
+        df.loc[mask & (df['atm'].isin([2, 3, 7, 8])), 'surf'] = 2 # Pluie/brouillard -> Mouillée
+        df.loc[mask & (df['atm'] == 4), 'surf'] = 5               # Neige -> Enneigée
     
     # Mode résiduel pour surf
     df['surf'] = df['surf'].fillna(df['surf'].mode()[0])
