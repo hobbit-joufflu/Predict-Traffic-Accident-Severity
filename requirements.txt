@@ -16,3 +16,6 @@ folium
 
 # Stats
 statsmodels
+
+# Downloads certificates
+certifi
